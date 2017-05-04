@@ -1,0 +1,2 @@
+# meteo
+Meteo.lv kartes
