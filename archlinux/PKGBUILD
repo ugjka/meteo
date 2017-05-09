@@ -2,7 +2,7 @@
 
 _pkgname=meteo
 pkgname="$_pkgname-git"
-pkgver=20170504.b5234b2
+pkgver=20170509.ba575e1
 pkgrel=1
 pkgdesc='Meteo.lv kartes'
 arch=('x86_64')

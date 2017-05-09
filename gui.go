@@ -130,7 +130,6 @@ func (w *weather) initWidgets() {
 			w.update()
 		} else {
 			w.counter = 0
-			fmt.Println("Wcounter:", w.counter)
 			w.update()
 		}
 	})
@@ -143,7 +142,6 @@ func (w *weather) initWidgets() {
 			w.update()
 		} else {
 			w.counter = 2 - (len(w.seg) - w.counter)
-			fmt.Println("Wcounter:", w.counter)
 			w.update()
 		}
 	})
@@ -156,7 +154,6 @@ func (w *weather) initWidgets() {
 			w.update()
 		} else {
 			w.counter = 3 - (len(w.seg) - w.counter)
-			fmt.Println("Wcounter:", w.counter)
 			w.update()
 		}
 	})
