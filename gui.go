@@ -75,6 +75,92 @@ func (w *weather) initWidgets() {
 	})
 	fatal(err)
 	grid.Attach(w.eventbox, 0, 1, 1, 1)
+	grid2, err := gtk.GridNew()
+	fatal(err)
+	grid2.SetBorderWidth(6)
+	grid2.SetColumnHomogeneous(true)
+	grid2.SetRowHomogeneous(true)
+	grid2.SetColumnSpacing(6)
+	grid.Attach(grid2, 0, 2, 1, 1)
+	backward3, err := gtk.ButtonNewWithLabel("<<<")
+	fatal(err)
+	backward3.Connect("clicked", func() {
+		if w.counter > 2 {
+			w.counter -= 3
+		} else {
+			w.counter = len(w.seg) - w.counter - 3
+		}
+		w.update()
+	})
+	grid2.Attach(backward3, 0, 0, 1, 1)
+	backward2, err := gtk.ButtonNewWithLabel("<<")
+	fatal(err)
+	backward2.Connect("clicked", func() {
+		if w.counter > 1 {
+			w.counter -= 2
+		} else {
+			w.counter = len(w.seg) - w.counter - 2
+		}
+		w.update()
+	})
+	grid2.Attach(backward2, 1, 0, 1, 1)
+	backward1, err := gtk.ButtonNewWithLabel("<")
+	backward1.Connect("clicked", func() {
+		if w.counter > 0 {
+			w.counter--
+		} else {
+			w.counter = len(w.seg) - w.counter - 1
+		}
+		w.update()
+	})
+	fatal(err)
+	grid2.Attach(backward1, 2, 0, 1, 1)
+	reset, err := gtk.ButtonNewWithLabel("reset")
+	fatal(err)
+	reset.Connect("clicked", func() {
+		w.counter = 0
+		w.update()
+	})
+	grid2.Attach(reset, 3, 0, 1, 1)
+	forward1, err := gtk.ButtonNewWithLabel(">")
+	fatal(err)
+	forward1.Connect("clicked", func() {
+		if w.counter < len(w.seg)-1 {
+			w.counter++
+			w.update()
+		} else {
+			w.counter = 0
+			fmt.Println("Wcounter:", w.counter)
+			w.update()
+		}
+	})
+	grid2.Attach(forward1, 4, 0, 1, 1)
+	forward2, err := gtk.ButtonNewWithLabel(">>")
+	fatal(err)
+	forward2.Connect("clicked", func() {
+		if w.counter+1 < len(w.seg)-1 {
+			w.counter += 2
+			w.update()
+		} else {
+			w.counter = 2 - (len(w.seg) - w.counter)
+			fmt.Println("Wcounter:", w.counter)
+			w.update()
+		}
+	})
+	grid2.Attach(forward2, 5, 0, 1, 1)
+	forward3, err := gtk.ButtonNewWithLabel(">>>")
+	fatal(err)
+	forward3.Connect("clicked", func() {
+		if w.counter+2 < len(w.seg)-1 {
+			w.counter += 3
+			w.update()
+		} else {
+			w.counter = 3 - (len(w.seg) - w.counter)
+			fmt.Println("Wcounter:", w.counter)
+			w.update()
+		}
+	})
+	grid2.Attach(forward3, 6, 0, 1, 1)
 	w.window.ShowAll()
 }
 
