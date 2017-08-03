@@ -2,8 +2,6 @@ package main
 
 import (
 	"fmt"
-	"io/ioutil"
-	"net/http"
 	"regexp"
 )
 
@@ -27,12 +25,7 @@ func (s segments) String() (out string) {
 }
 
 func getSegments(url string) segments {
-	resp, err := http.Get(url)
-	if err != nil {
-		panic(err)
-	}
-	defer resp.Body.Close()
-	data, err := ioutil.ReadAll(resp.Body)
+	data, err := getter(url + "?nid=999")
 	if err != nil {
 		panic(err)
 	}

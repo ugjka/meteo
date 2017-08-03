@@ -183,7 +183,7 @@ func (w *weather) update() {
 }
 
 func getPixbuf(seg segment) (pix *gdk.Pixbuf) {
-	req, err := getter("http://meteo.lv" + seg.image)
+	req, err := getter("https://www.meteo.lv" + seg.image)
 	fatal(err)
 	img, err := png.Decode(bytes.NewReader(req))
 	fatal(err)
@@ -206,12 +206,21 @@ func fatal(err error) {
 }
 
 func getter(url string) (data []byte, err error) {
-	client := http.Client{}
+	client := http.Client{
+		CheckRedirect: func(req *http.Request, via []*http.Request) error {
+			return http.ErrUseLastResponse
+		},
+	}
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		return
 	}
-	req.Header.Set("Location", "http://meteo.lv/laiks/")
+	for _, v := range cookies {
+		req.AddCookie(v)
+	}
+	req.Header.Set("Referer", url)
+	req.Header.Set("Accept-Language", "en-US,en;q=0.8,lv;q=0.6,ru;q=0.4,da;q=0.2")
+	req.Header.Set("User-Agent", "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.78 Safari/537.36")
 	get, err := client.Do(req)
 	if err != nil {
 		return
@@ -225,4 +234,26 @@ func getter(url string) (data []byte, err error) {
 		return
 	}
 	return
+}
+
+func getCookie(url string) (cookie []*http.Cookie, err error) {
+	client := http.Client{
+		CheckRedirect: func(req *http.Request, via []*http.Request) error {
+			return http.ErrUseLastResponse
+		},
+	}
+	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		return
+	}
+
+	req.Header.Set("Referer", url)
+	req.Header.Set("Accept-Language", "en-US,en;q=0.8,lv;q=0.6,ru;q=0.4,da;q=0.2")
+	req.Header.Set("User-Agent", "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.78 Safari/537.36")
+	resp, err := client.Do(req)
+	if err != nil {
+		return
+	}
+	defer resp.Body.Close()
+	return resp.Cookies(), nil
 }

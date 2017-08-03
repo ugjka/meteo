@@ -1,19 +1,29 @@
 package main
 
-import "github.com/gotk3/gotk3/gtk"
+import (
+	"net/http"
+
+	"github.com/gotk3/gotk3/gtk"
+)
 
 var icon = "./logo.png"
+var cookies []*http.Cookie
 
 const (
 	//foreca = "http://meteo.lv/laiks/"
-	precip = "http://meteo.lv/laiks/nokrisni/"
-	clouds = "http://meteo.lv/laiks/makoni/"
-	temper = "http://meteo.lv/laiks/temperatura/"
-	confor = "http://meteo.lv/laiks/komforta-temperatura/"
-	windin = "http://meteo.lv/laiks/vejs/"
+	precip = "https://www.meteo.lv/laiks/nokrisni/"
+	clouds = "https://www.meteo.lv/laiks/makoni/"
+	temper = "https://www.meteo.lv/laiks/temperatura/"
+	confor = "https://www.meteo.lv/laiks/komforta-temperatura/"
+	windin = "https://www.meteo.lv/laiks/vejs/"
 )
 
 func main() {
+	var err error
+	cookies, err = getCookie("https://www.meteo.lv/")
+	if err != nil {
+		panic(err)
+	}
 	lietus := getSegments(precip)
 	var win weather
 	win.seg = lietus
