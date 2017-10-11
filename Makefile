@@ -5,7 +5,7 @@ appname = meteo
 
 all:
 	GOPATH=$(GOPATH) go get -d github.com/ugjka/$(appname)
-	GOPATH=$(GOPATH) go build -v -tags "gtk_3_20" -ldflags="-X main.icon=$(prefix)/share/icons/hicolor/256x256/apps/$(appname).png"
+	GOPATH=$(GOPATH) go build -v -ldflags="-X main.icon=$(prefix)/share/icons/hicolor/256x256/apps/$(appname).png"
 
 install:
 	install -Dm755 $(appname) $(prefix)/bin/$(appname)
