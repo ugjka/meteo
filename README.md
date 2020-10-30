@@ -1,6 +1,6 @@
 # Meteo.lv
 
-[Meteo.lv kartes](https://www.meteo.lv/laiks/nokrisni/?nid=557)
+Vecās [meteo.lv kartes](https://www.meteo.lv/laiks/nokrisni/?nid=557)
 
 [![Donate](paypal.svg?raw=true)](https://www.paypal.me/ugjka)
 
