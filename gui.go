@@ -57,14 +57,14 @@ func (w *weather) initWidgets() {
 	fatal(err)
 	w.eventbox.Add(w.image)
 	_, err = w.eventbox.Connect("button-press-event", func(b *gtk.EventBox, e *gdk.Event) {
-		if gdk.EventKeyNewFromEvent(e).Type() == gdk.EVENT_BUTTON_PRESS && gdk.EventButtonNewFromEvent(e).ButtonVal() == uint(3) {
+		if gdk.EventKeyNewFromEvent(e).Type() == gdk.EVENT_BUTTON_PRESS && gdk.EventButtonNewFromEvent(e).State() == uint(3) {
 			if w.counter > 0 {
 				w.counter--
 			} else {
 				w.counter = len(w.seg) - 1
 			}
 		}
-		if gdk.EventKeyNewFromEvent(e).Type() == gdk.EVENT_BUTTON_PRESS && gdk.EventButtonNewFromEvent(e).ButtonVal() == uint(1) {
+		if gdk.EventKeyNewFromEvent(e).Type() == gdk.EVENT_BUTTON_PRESS && gdk.EventButtonNewFromEvent(e).State() == uint(1) {
 			if w.counter < (len(w.seg) - 1) {
 				w.counter++
 			} else {

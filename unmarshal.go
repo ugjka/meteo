@@ -25,7 +25,7 @@ func (s segments) String() (out string) {
 }
 
 func getSegments(url string) segments {
-	data, err := getter(url + "?nid=999")
+	data, err := getter(url + "?nid=557")
 	if err != nil {
 		panic(err)
 	}
