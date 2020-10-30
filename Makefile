@@ -20,5 +20,6 @@ uninstall:
 	rm "$(prefix)/share/applications/$(appname).desktop"
 
 clean:
+	chmod -R 755 $(GOPATH)
 	rm -rf $(GOPATH)
 	rm $(appname)
