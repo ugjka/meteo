@@ -2,7 +2,7 @@
 
 _pkgname=meteo
 pkgname="$_pkgname-git"
-pkgver=20201030.aa49a77
+pkgver=20201030.9bc4dec
 pkgrel=1
 pkgdesc='Meteo.lv kartes'
 arch=('x86_64')
@@ -10,7 +10,7 @@ url="https://github.com/ugjka/${_pkgname}"
 license=('MIT')
 depends=('gtk3' 'glib2')
 makedepends=('go' 'go-tools' 'git' 'make')
-source=("$_pkgname"::"git+http://github.com/ugjka/${_pkgname}.git")
+source=("$_pkgname"::"git+https://github.com/ugjka/${_pkgname}.git")
 md5sums=('SKIP')
 
 pkgver() {
