@@ -1,8 +1,19 @@
-# meteo
-Meteo.lv kartes
+# Meteo.lv
 
-[![Donate](https://dl.ugjka.net/Donate-PayPal-green.svg)](https://www.paypal.me/ugjka)
+[Meteo.lv kartes](https://www.meteo.lv/laiks/nokrisni/?nid=557)
 
-Ar peles kreiso klikški iet uz priekšu, ar labo uz atpakaļu
+[![Donate](paypal.svg?raw=true)](https://www.paypal.me/ugjka)
 
-![screenshot](https://img.ugjka.net/t8AOjEsv.png)
+![screenshot](screenshot.png?raw=true)
+
+## Instalācija (tikai linux)
+
+Vajag Make, GTK, Go un Go-Tools
+
+Kompilēt: `make`
+
+Instalēt: `sudo make install`
+
+Atinstalēt: `sudo make uninstall`
+
+Attīrīt: `make clean`
