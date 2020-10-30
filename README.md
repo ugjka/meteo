@@ -6,7 +6,7 @@ Vecās [meteo.lv kartes](https://www.meteo.lv/laiks/nokrisni/?nid=557)
 
 ![screenshot](screenshot.png?raw=true)
 
-## Instalācija (tikai linux)
+## Instalācija (tikai Linux)
 
 Vajag Make, GTK, Go un Go-Tools
 
