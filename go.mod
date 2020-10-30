@@ -1,4 +1,4 @@
-module meteo
+module github.com/ugjka/meteo
 
 go 1.15
 
