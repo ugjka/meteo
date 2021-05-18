@@ -1,5 +1,10 @@
 module github.com/ugjka/meteo
 
-go 1.15
+go 1.16
 
-require github.com/gotk3/gotk3 v0.5.1-0.20201028052159-952547abf55a
+require (
+	github.com/lxn/walk v0.0.0-20210112085537-c389da54e794
+	github.com/lxn/win v0.0.0-20210218163916-a377121e959e // indirect
+	golang.org/x/sys v0.0.0-20210514084401-e8d321eab015 // indirect
+	gopkg.in/Knetic/govaluate.v3 v3.0.0 // indirect
+)

@@ -6,14 +6,6 @@ Vecās [meteo.lv kartes](https://www.meteo.lv/laiks/nokrisni/?nid=557)
 
 ![screenshot](screenshot.png?raw=true)
 
-## Instalācija (tikai Linux)
+## Instalācija (tikai Windows)
 
-Vajag Make, GTK, Go un Go-Tools
-
-Kompilēt: `make`
-
-Instalēt: `sudo make install`
-
-Atinstalēt: `sudo make uninstall`
-
-Attīrīt: `make clean`
+EXE fails iekš releases sadaļā

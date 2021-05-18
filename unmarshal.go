@@ -29,7 +29,7 @@ func getSegments(url string) segments {
 	if err != nil {
 		panic(err)
 	}
-	reg := regexp.MustCompile("(\\/dynamic.*\\.png).*(\\d{2}\\.\\d{2}\\.\\d{4}).*(\\d{2}\\:\\d{2})")
+	reg := regexp.MustCompile(`([/]dynamic.*[.]png).*(\d{2}[.]\d{2}[.]\d{4}).*(\d{2}[:]\d{2})`)
 	matches := reg.FindAllStringSubmatch(string(data), 100)
 	segs := make(segments, len(matches))
 	for i, v := range matches {
