@@ -24,10 +24,10 @@ func (s segments) String() (out string) {
 	return
 }
 
-func getSegments(url string) segments {
-	data, err := getter(url + "?nid=557")
+func loadSegments(url string) (segments, error) {
+	data, err := get(url + "?nid=557")
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 	reg := regexp.MustCompile(`([/]dynamic.*[.]png).*(\d{2}[.]\d{2}[.]\d{4}).*(\d{2}[:]\d{2})`)
 	matches := reg.FindAllStringSubmatch(string(data), 100)
@@ -37,5 +37,5 @@ func getSegments(url string) segments {
 		segs[i].date = v[2]
 		segs[i].time = v[3]
 	}
-	return segs
+	return segs, nil
 }
