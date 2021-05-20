@@ -8,6 +8,8 @@ import (
 	"io/ioutil"
 	"net/http"
 
+	_ "embed"
+
 	"github.com/lxn/walk"
 	. "github.com/lxn/walk/declarative"
 )
@@ -30,7 +32,13 @@ var modes = []string{
 	windin,
 }
 
+//go:embed logo.png
+var icon []byte
+
 func main() {
+	iconParsed, _ := png.Decode(bytes.NewBuffer(icon))
+	iconBitmap, _ := walk.NewBitmapFromImageForDPI(iconParsed, 96)
+
 	imagebox := &walk.ImageView{}
 	selector := &walk.ComboBox{}
 	textedit := &walk.TextEdit{}
@@ -74,15 +82,17 @@ func main() {
 			},
 				CurrentIndex: 0,
 				OnCurrentIndexChanged: func() {
-					id := selector.CurrentIndex()
-					segs, err = loadSegments(modes[id])
-					if err != nil {
-						textedit.SetText(err.Error())
-						textedit.SetVisible(true)
-						imagebox.SetVisible(false)
-					} else {
-						load(current)
-					}
+					go func() {
+						id := selector.CurrentIndex()
+						segs, err = loadSegments(modes[id])
+						if err != nil {
+							textedit.SetText(err.Error())
+							textedit.SetVisible(true)
+							imagebox.SetVisible(false)
+						} else {
+							load(current)
+						}
+					}()
 				},
 				AssignTo: &selector,
 			},
@@ -104,7 +114,7 @@ func main() {
 							} else {
 								current -= 3
 							}
-							load(current)
+							go load(current)
 						},
 					},
 					PushButton{
@@ -115,7 +125,7 @@ func main() {
 							} else {
 								current -= 2
 							}
-							load(current)
+							go load(current)
 						},
 					},
 					PushButton{
@@ -126,13 +136,13 @@ func main() {
 							} else {
 								current--
 							}
-							load(current)
+							go load(current)
 						},
 					},
 					PushButton{
 						Text: "RESET",
 						OnClicked: func() {
-							load(0)
+							go load(0)
 						},
 					},
 					PushButton{
@@ -143,7 +153,7 @@ func main() {
 							} else {
 								current++
 							}
-							load(current)
+							go load(current)
 						},
 					},
 					PushButton{
@@ -154,7 +164,7 @@ func main() {
 							} else {
 								current += 2
 							}
-							load(current)
+							go load(current)
 						},
 					},
 					PushButton{
@@ -165,13 +175,15 @@ func main() {
 							} else {
 								current += 3
 							}
-							load(current)
+							go load(current)
 						},
 					},
 				},
 			},
 		},
 	}.Create()
+
+	mainWindow.SetIcon(iconBitmap)
 
 	cookies, err = loadCookies("https://www.meteo.lv/")
 	if err != nil {
@@ -186,7 +198,7 @@ func main() {
 		textedit.SetVisible(true)
 		imagebox.SetVisible(false)
 	} else {
-		load(0)
+		go load(0)
 	}
 
 	mainWindow.Run()
