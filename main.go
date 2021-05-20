@@ -7,6 +7,7 @@ import (
 	"image/png"
 	"io/ioutil"
 	"net/http"
+	"regexp"
 
 	_ "embed"
 
@@ -36,23 +37,23 @@ var modes = []string{
 var icon []byte
 
 func main() {
-	iconParsed, _ := png.Decode(bytes.NewBuffer(icon))
-	iconBitmap, _ := walk.NewBitmapFromImageForDPI(iconParsed, 96)
+	iconDecoded, _ := png.Decode(bytes.NewBuffer(icon))
+	iconBitmap, _ := walk.NewBitmapFromImageForDPI(iconDecoded, 96)
 
 	imagebox := &walk.ImageView{}
 	selector := &walk.ComboBox{}
 	textedit := &walk.TextEdit{}
 	mainWindow := &walk.MainWindow{}
-	var segs segments
+	var forecast items
 	var err error
 	var current = 0
 
 	load := func(i int) {
-		if len(segs) == 0 {
+		if len(forecast) == 0 {
 			return
 		}
 		var bitmap = new(walk.Bitmap)
-		rawimage, err := loadIMG(segs[i])
+		rawimage, err := loadIMG(forecast[i])
 		if err != nil {
 			textedit.SetText(err.Error())
 			textedit.SetVisible(true)
@@ -84,7 +85,7 @@ func main() {
 				OnCurrentIndexChanged: func() {
 					go func() {
 						id := selector.CurrentIndex()
-						segs, err = loadSegments(modes[id])
+						forecast, err = loadForecast(modes[id])
 						if err != nil {
 							textedit.SetText(err.Error())
 							textedit.SetVisible(true)
@@ -110,7 +111,7 @@ func main() {
 						Text: "<<<",
 						OnClicked: func() {
 							if current-2 < 0 {
-								current = len(segs) - 1
+								current = len(forecast) - 1
 							} else {
 								current -= 3
 							}
@@ -121,7 +122,7 @@ func main() {
 						Text: "<<",
 						OnClicked: func() {
 							if current-2 < 0 {
-								current = len(segs) - 1
+								current = len(forecast) - 1
 							} else {
 								current -= 2
 							}
@@ -132,7 +133,7 @@ func main() {
 						Text: "<",
 						OnClicked: func() {
 							if current-1 < 0 {
-								current = len(segs) - 1
+								current = len(forecast) - 1
 							} else {
 								current--
 							}
@@ -149,7 +150,7 @@ func main() {
 					PushButton{
 						Text: ">",
 						OnClicked: func() {
-							if current+1 > len(segs)-1 {
+							if current+1 > len(forecast)-1 {
 								current = 0
 							} else {
 								current++
@@ -160,7 +161,7 @@ func main() {
 					PushButton{
 						Text: ">>",
 						OnClicked: func() {
-							if current+2 > len(segs)-1 {
+							if current+2 > len(forecast)-1 {
 								current = 0
 							} else {
 								current += 2
@@ -171,7 +172,7 @@ func main() {
 					PushButton{
 						Text: ">>>",
 						OnClicked: func() {
-							if current+3 > len(segs)-1 {
+							if current+3 > len(forecast)-1 {
 								current = 0
 							} else {
 								current += 3
@@ -193,7 +194,7 @@ func main() {
 		imagebox.SetVisible(false)
 	}
 
-	segs, err = loadSegments(precip)
+	forecast, err = loadForecast(precip)
 	if err != nil {
 		textedit.SetText(err.Error())
 		textedit.SetVisible(true)
@@ -205,8 +206,8 @@ func main() {
 	mainWindow.Run()
 }
 
-func loadIMG(seg segment) (image.Image, error) {
-	req, err := get("https://www.meteo.lv" + seg.image)
+func loadIMG(i item) (image.Image, error) {
+	req, err := get("https://www.meteo.lv" + i.image)
 	if err != nil {
 		return nil, err
 	}
@@ -260,4 +261,28 @@ func loadCookies(url string) ([]*http.Cookie, error) {
 	}
 	defer resp.Body.Close()
 	return resp.Cookies(), nil
+}
+
+type item struct {
+	image string
+	date  string
+	time  string
+}
+
+type items []item
+
+func loadForecast(url string) (items, error) {
+	data, err := get(url + "?nid=557")
+	if err != nil {
+		return nil, err
+	}
+	reg := regexp.MustCompile(`([/]dynamic.*[.]png).*(\d{2}[.]\d{2}[.]\d{4}).*(\d{2}[:]\d{2})`)
+	matches := reg.FindAllStringSubmatch(string(data), 100)
+	segs := make(items, len(matches))
+	for i, v := range matches {
+		segs[i].image = v[1]
+		segs[i].date = v[2]
+		segs[i].time = v[3]
+	}
+	return segs, nil
 }
