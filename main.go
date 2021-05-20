@@ -142,6 +142,7 @@ func main() {
 					PushButton{
 						Text: "RESET",
 						OnClicked: func() {
+							current = 0
 							go load(0)
 						},
 					},
