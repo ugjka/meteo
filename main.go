@@ -116,6 +116,7 @@ func main() {
 				AssignTo: &textEdit,
 			},
 			ImageView{
+				Mode:     ImageViewModeZoom,
 				AssignTo: &imageView,
 			},
 			Composite{
@@ -200,7 +201,6 @@ func main() {
 	}.Create()
 
 	mainWindow.SetIcon(iconBitmap)
-	imageView.SetMode(walk.ImageViewModeZoom)
 
 	cookies, err = loadCookies(page)
 	if err != nil {
