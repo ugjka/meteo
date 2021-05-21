@@ -33,7 +33,7 @@ var modes = []string{
 	windin,
 }
 
-var modesStr = []string{
+var modesDisplay = []string{
 	"Nokrišņi",
 	"Mākoņi",
 	"Temperatūra",
@@ -52,9 +52,9 @@ func main() {
 	iconDecoded, _ := png.Decode(bytes.NewBuffer(icon))
 	iconBitmap, _ := walk.NewBitmapFromImageForDPI(iconDecoded, 96)
 
-	imagebox := &walk.ImageView{}
-	selector := &walk.ComboBox{}
-	textedit := &walk.TextEdit{}
+	imageView := &walk.ImageView{}
+	comboBox := &walk.ComboBox{}
+	textEdit := &walk.TextEdit{}
 	mainWindow := &walk.MainWindow{}
 	var forecast []string
 	var err error
@@ -66,16 +66,16 @@ func main() {
 			return
 		}
 		var bitmap = new(walk.Bitmap)
-		rawimage, err := loadIMG(forecast[i])
+		rawImage, err := loadIMG(forecast[i])
 		if err != nil {
-			textedit.SetText(err.Error())
-			textedit.SetVisible(true)
-			imagebox.SetVisible(false)
+			textEdit.SetText(err.Error())
+			textEdit.SetVisible(true)
+			imageView.SetVisible(false)
 		} else {
-			textedit.SetVisible(false)
-			imagebox.SetVisible(true)
-			bitmap, _ = walk.NewBitmapFromImageForDPI(rawimage, 96)
-			imagebox.SetImage(bitmap)
+			textEdit.SetVisible(false)
+			imageView.SetVisible(true)
+			bitmap, _ = walk.NewBitmapFromImageForDPI(rawImage, 96)
+			imageView.SetImage(bitmap)
 		}
 	}
 
@@ -88,35 +88,34 @@ func main() {
 		Layout: VBox{},
 		Children: []Widget{
 			ComboBox{
-				Model:        modesStr,
+				Model:        modesDisplay,
 				CurrentIndex: 0,
 				OnCurrentIndexChanged: func() {
-					if selector.CurrentIndex() == mode {
+					if comboBox.CurrentIndex() == mode {
 						return
 					}
-					mode = selector.CurrentIndex()
+					mode = comboBox.CurrentIndex()
 
 					go func() {
-						id := selector.CurrentIndex()
-						forecast, err = loadForecast(modes[id])
+						forecast, err = loadForecast(modes[mode])
 						if err != nil {
-							textedit.SetText(err.Error())
-							textedit.SetVisible(true)
-							imagebox.SetVisible(false)
+							textEdit.SetText(err.Error())
+							textEdit.SetVisible(true)
+							imageView.SetVisible(false)
 						} else {
 							load(current)
 						}
 					}()
 				},
-				AssignTo: &selector,
+				AssignTo: &comboBox,
 			},
 			TextEdit{
 				ReadOnly: true,
 				Visible:  false,
-				AssignTo: &textedit,
+				AssignTo: &textEdit,
 			},
 			ImageView{
-				AssignTo: &imagebox,
+				AssignTo: &imageView,
 			},
 			Composite{
 				Layout: HBox{},
@@ -203,16 +202,16 @@ func main() {
 
 	cookies, err = loadCookies(page)
 	if err != nil {
-		textedit.SetText(err.Error())
-		textedit.SetVisible(true)
-		imagebox.SetVisible(false)
+		textEdit.SetText(err.Error())
+		textEdit.SetVisible(true)
+		imageView.SetVisible(false)
 	}
 
 	forecast, err = loadForecast(precip)
 	if err != nil {
-		textedit.SetText(err.Error())
-		textedit.SetVisible(true)
-		imagebox.SetVisible(false)
+		textEdit.SetText(err.Error())
+		textEdit.SetVisible(true)
+		imageView.SetVisible(false)
 	} else {
 		go load(0)
 	}
@@ -228,44 +227,44 @@ func loadIMG(i string) (image.Image, error) {
 	return png.Decode(bytes.NewReader(req))
 }
 
-func get(url string) ([]byte, error) {
+func get(URL string) ([]byte, error) {
 	client := http.Client{
 		CheckRedirect: func(req *http.Request, via []*http.Request) error {
 			return http.ErrUseLastResponse
 		},
 	}
-	req, err := http.NewRequest("GET", url, nil)
+	req, err := http.NewRequest("GET", URL, nil)
 	if err != nil {
 		return nil, err
 	}
 	for _, v := range cookies {
 		req.AddCookie(v)
 	}
-	req.Header.Set("Referer", url)
+	req.Header.Set("Referer", URL)
 	req.Header.Set("User-Agent", userAgent)
-	get, err := client.Do(req)
+	resp, err := client.Do(req)
 	if err != nil {
 		return nil, err
 	}
-	defer get.Body.Close()
-	if get.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("status: %d", get.StatusCode)
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("status: %d", resp.StatusCode)
 	}
-	return ioutil.ReadAll(get.Body)
+	return ioutil.ReadAll(resp.Body)
 }
 
-func loadCookies(url string) ([]*http.Cookie, error) {
+func loadCookies(URL string) ([]*http.Cookie, error) {
 	client := http.Client{
 		CheckRedirect: func(req *http.Request, via []*http.Request) error {
 			return http.ErrUseLastResponse
 		},
 	}
-	req, err := http.NewRequest("GET", url, nil)
+	req, err := http.NewRequest("GET", URL, nil)
 	if err != nil {
 		return nil, err
 	}
 
-	req.Header.Set("Referer", url)
+	req.Header.Set("Referer", URL)
 	req.Header.Set("User-Agent", userAgent)
 	resp, err := client.Do(req)
 	if err != nil {
@@ -275,8 +274,8 @@ func loadCookies(url string) ([]*http.Cookie, error) {
 	return resp.Cookies(), nil
 }
 
-func loadForecast(url string) ([]string, error) {
-	data, err := get(url + magicString)
+func loadForecast(URL string) ([]string, error) {
+	data, err := get(URL + magicString)
 	if err != nil {
 		return nil, err
 	}
