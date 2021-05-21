@@ -78,7 +78,7 @@ func main() {
 				"Nokrišņi",
 				"Mākoņi",
 				"Temperatūra",
-				"Konforta temperatūra",
+				"Komforta temperatūra",
 				"Vējš",
 			},
 				CurrentIndex: 0,
