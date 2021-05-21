@@ -1,3 +1,4 @@
+// meteo.lv vecā tipa kartes
 package main
 
 import (
@@ -8,6 +9,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"regexp"
+	"strings"
 
 	_ "embed"
 
@@ -50,24 +52,30 @@ var imageURLsReg = regexp.MustCompile(`([/]dynamic.*[.]png).*\d{2}[.]\d{2}[.]\d{
 //go:embed logo.png
 var icon []byte
 
+const appErrorStr = `Radās sekojošā klūda: %s
+
+Pārbaudiet savu interneta savienujumu un restartējiet aplikāciju.
+
+Vai ziņojiet: esesmu@protonmail.com`
+
 func main() {
 
-	imageView := &walk.ImageView{}
-	comboBox := &walk.ComboBox{}
-	textEdit := &walk.TextEdit{}
-	mainWindow := &walk.MainWindow{}
+	var imageView = new(walk.ImageView)
+	var comboBox = new(walk.ComboBox)
+	var textEdit = new(walk.TextEdit)
+	var mainWindow = new(walk.MainWindow)
 	var forecast []string
 	var err error
 	var current = 0
 	var mode = 0
 
-	load := func(i int) {
+	var load = func(i int) {
 		if len(forecast) == 0 {
 			return
 		}
 		imageRaw, err := loadIMG(forecast[i])
 		if err != nil {
-			textEdit.SetText(err.Error())
+			appError(textEdit, err)
 			textEdit.SetVisible(true)
 			imageView.SetVisible(false)
 		} else {
@@ -98,7 +106,7 @@ func main() {
 					go func() {
 						forecast, err = loadForecast(modes[mode])
 						if err != nil {
-							textEdit.SetText(err.Error())
+							appError(textEdit, err)
 							textEdit.SetVisible(true)
 							imageView.SetVisible(false)
 						} else {
@@ -207,7 +215,7 @@ func main() {
 		forecast, err = loadForecast(precipitation)
 	}
 	if err != nil {
-		textEdit.SetText(err.Error())
+		appError(textEdit, err)
 		textEdit.SetVisible(true)
 		imageView.SetVisible(false)
 	} else {
@@ -217,12 +225,12 @@ func main() {
 	mainWindow.Run()
 }
 
-func loadIMG(i string) (image.Image, error) {
-	req, err := get(page + i)
+func loadIMG(URL string) (image.Image, error) {
+	data, err := get(page + URL)
 	if err != nil {
 		return nil, err
 	}
-	return png.Decode(bytes.NewReader(req))
+	return png.Decode(bytes.NewReader(data))
 }
 
 func get(URL string) ([]byte, error) {
@@ -283,4 +291,8 @@ func loadForecast(URL string) ([]string, error) {
 		imageURLs[i] = v[1]
 	}
 	return imageURLs, nil
+}
+
+func appError(textEdit *walk.TextEdit, err error) {
+	textEdit.SetText(fmt.Sprintf(strings.Replace(appErrorStr, "\n", "\r\n", -1), err))
 }
