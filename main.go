@@ -45,12 +45,14 @@ const userAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 
 const page = "https://www.meteo.lv"
 const magicString = "?nid=557"
 
+var imageURLsReg = regexp.MustCompile(`([/]dynamic.*[.]png).*\d{2}[.]\d{2}[.]\d{4}.*\d{2}[:]\d{2}`)
+
 //go:embed logo.png
 var icon []byte
 
 func main() {
-	iconDecoded, _ := png.Decode(bytes.NewBuffer(icon))
-	iconBitmap, _ := walk.NewBitmapFromImageForDPI(iconDecoded, 96)
+	iconRaw, _ := png.Decode(bytes.NewBuffer(icon))
+	iconBitmap, _ := walk.NewBitmapFromImageForDPI(iconRaw, 96)
 
 	imageView := &walk.ImageView{}
 	comboBox := &walk.ComboBox{}
@@ -65,8 +67,7 @@ func main() {
 		if len(forecast) == 0 {
 			return
 		}
-		var bitmap = new(walk.Bitmap)
-		rawImage, err := loadIMG(forecast[i])
+		imageRaw, err := loadIMG(forecast[i])
 		if err != nil {
 			textEdit.SetText(err.Error())
 			textEdit.SetVisible(true)
@@ -74,8 +75,8 @@ func main() {
 		} else {
 			textEdit.SetVisible(false)
 			imageView.SetVisible(true)
-			bitmap, _ = walk.NewBitmapFromImageForDPI(rawImage, 96)
-			imageView.SetImage(bitmap)
+			imageBitmap, _ := walk.NewBitmapFromImageForDPI(imageRaw, 96)
+			imageView.SetImage(imageBitmap)
 		}
 	}
 
@@ -279,11 +280,10 @@ func loadForecast(URL string) ([]string, error) {
 	if err != nil {
 		return nil, err
 	}
-	reg := regexp.MustCompile(`([/]dynamic.*[.]png).*\d{2}[.]\d{2}[.]\d{4}.*\d{2}[:]\d{2}`)
-	matches := reg.FindAllStringSubmatch(string(data), 100)
-	images := make([]string, len(matches))
+	matches := imageURLsReg.FindAllStringSubmatch(string(data), -1)
+	imageURLs := make([]string, len(matches))
 	for i, v := range matches {
-		images[i] = v[1]
+		imageURLs[i] = v[1]
 	}
-	return images, nil
+	return imageURLs, nil
 }
