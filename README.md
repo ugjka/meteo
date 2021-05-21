@@ -8,4 +8,4 @@ Vecās [meteo.lv kartes](https://www.meteo.lv/laiks/nokrisni/?nid=557)
 
 ## Instalācija (tikai Windows)
 
-EXE fails: https://github.com/ugjka/meteo/releases/download/v1.0.3/meteo.exe
+EXE fails: https://github.com/ugjka/meteo/releases/download/v1.0.4/meteo.exe
