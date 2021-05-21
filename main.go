@@ -18,19 +18,19 @@ import (
 var cookies []*http.Cookie
 
 const (
-	precip = "https://www.meteo.lv/laiks/nokrisni/"
-	clouds = "https://www.meteo.lv/laiks/makoni/"
-	temper = "https://www.meteo.lv/laiks/temperatura/"
-	confor = "https://www.meteo.lv/laiks/komforta-temperatura/"
-	windin = "https://www.meteo.lv/laiks/vejs/"
+	precipitation = "https://www.meteo.lv/laiks/nokrisni/"
+	clouds        = "https://www.meteo.lv/laiks/makoni/"
+	temperature   = "https://www.meteo.lv/laiks/temperatura/"
+	comfort       = "https://www.meteo.lv/laiks/komforta-temperatura/"
+	wind          = "https://www.meteo.lv/laiks/vejs/"
 )
 
 var modes = []string{
-	precip,
+	precipitation,
 	clouds,
-	temper,
-	confor,
-	windin,
+	temperature,
+	comfort,
+	wind,
 }
 
 var modesDisplay = []string{
@@ -203,13 +203,9 @@ func main() {
 	mainWindow.SetIcon(iconBitmap)
 
 	cookies, err = loadCookies(page)
-	if err != nil {
-		textEdit.SetText(err.Error())
-		textEdit.SetVisible(true)
-		imageView.SetVisible(false)
+	if err == nil {
+		forecast, err = loadForecast(precipitation)
 	}
-
-	forecast, err = loadForecast(precip)
 	if err != nil {
 		textEdit.SetText(err.Error())
 		textEdit.SetVisible(true)
