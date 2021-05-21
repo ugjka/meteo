@@ -51,8 +51,6 @@ var imageURLsReg = regexp.MustCompile(`([/]dynamic.*[.]png).*\d{2}[.]\d{2}[.]\d{
 var icon []byte
 
 func main() {
-	iconRaw, _ := png.Decode(bytes.NewBuffer(icon))
-	iconBitmap, _ := walk.NewBitmapFromImageForDPI(iconRaw, 96)
 
 	imageView := &walk.ImageView{}
 	comboBox := &walk.ComboBox{}
@@ -200,6 +198,8 @@ func main() {
 		},
 	}.Create()
 
+	iconRaw, _ := png.Decode(bytes.NewBuffer(icon))
+	iconBitmap, _ := walk.NewBitmapFromImageForDPI(iconRaw, 96)
 	mainWindow.SetIcon(iconBitmap)
 
 	cookies, err = loadCookies(page)
