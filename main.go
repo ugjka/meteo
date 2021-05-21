@@ -83,8 +83,8 @@ func main() {
 		AssignTo: &mainWindow,
 		Title:    "Meteo.lv",
 		Size: Size{
-			Width:  650,
-			Height: 400},
+			Width:  652,
+			Height: 553},
 		Layout: VBox{},
 		Children: []Widget{
 			ComboBox{
@@ -118,7 +118,8 @@ func main() {
 			ImageView{
 				AssignTo: &imagebox,
 			},
-			HSplitter{
+			Composite{
+				Layout: HBox{},
 				Children: []Widget{
 					PushButton{
 						Text: "<<<",
