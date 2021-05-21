@@ -33,6 +33,18 @@ var modes = []string{
 	windin,
 }
 
+var modesStr = []string{
+	"Nokrišņi",
+	"Mākoņi",
+	"Temperatūra",
+	"Komforta temperatūra",
+	"Vējš",
+}
+
+const userAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.212 Safari/537.36"
+const page = "https://www.meteo.lv"
+const magicString = "?nid=557"
+
 //go:embed logo.png
 var icon []byte
 
@@ -44,9 +56,10 @@ func main() {
 	selector := &walk.ComboBox{}
 	textedit := &walk.TextEdit{}
 	mainWindow := &walk.MainWindow{}
-	var forecast items
+	var forecast []string
 	var err error
 	var current = 0
+	var mode = 0
 
 	load := func(i int) {
 		if len(forecast) == 0 {
@@ -68,21 +81,21 @@ func main() {
 
 	MainWindow{
 		AssignTo: &mainWindow,
-		Title:    "Meteo",
+		Title:    "Meteo.lv",
 		Size: Size{
 			Width:  650,
 			Height: 400},
 		Layout: VBox{},
 		Children: []Widget{
-			ComboBox{Model: []string{
-				"Nokrišņi",
-				"Mākoņi",
-				"Temperatūra",
-				"Komforta temperatūra",
-				"Vējš",
-			},
+			ComboBox{
+				Model:        modesStr,
 				CurrentIndex: 0,
 				OnCurrentIndexChanged: func() {
+					if selector.CurrentIndex() == mode {
+						return
+					}
+					mode = selector.CurrentIndex()
+
 					go func() {
 						id := selector.CurrentIndex()
 						forecast, err = loadForecast(modes[id])
@@ -187,7 +200,7 @@ func main() {
 
 	mainWindow.SetIcon(iconBitmap)
 
-	cookies, err = loadCookies("https://www.meteo.lv/")
+	cookies, err = loadCookies(page)
 	if err != nil {
 		textedit.SetText(err.Error())
 		textedit.SetVisible(true)
@@ -206,8 +219,8 @@ func main() {
 	mainWindow.Run()
 }
 
-func loadIMG(i item) (image.Image, error) {
-	req, err := get("https://www.meteo.lv" + i.image)
+func loadIMG(i string) (image.Image, error) {
+	req, err := get(page + i)
 	if err != nil {
 		return nil, err
 	}
@@ -228,8 +241,7 @@ func get(url string) ([]byte, error) {
 		req.AddCookie(v)
 	}
 	req.Header.Set("Referer", url)
-	req.Header.Set("Accept-Language", "en-US,en;q=0.8,lv;q=0.6,ru;q=0.4,da;q=0.2")
-	req.Header.Set("User-Agent", "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.78 Safari/537.36")
+	req.Header.Set("User-Agent", userAgent)
 	get, err := client.Do(req)
 	if err != nil {
 		return nil, err
@@ -253,8 +265,7 @@ func loadCookies(url string) ([]*http.Cookie, error) {
 	}
 
 	req.Header.Set("Referer", url)
-	req.Header.Set("Accept-Language", "en-US,en;q=0.8,lv;q=0.6,ru;q=0.4,da;q=0.2")
-	req.Header.Set("User-Agent", "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.78 Safari/537.36")
+	req.Header.Set("User-Agent", userAgent)
 	resp, err := client.Do(req)
 	if err != nil {
 		return nil, err
@@ -263,26 +274,16 @@ func loadCookies(url string) ([]*http.Cookie, error) {
 	return resp.Cookies(), nil
 }
 
-type item struct {
-	image string
-	date  string
-	time  string
-}
-
-type items []item
-
-func loadForecast(url string) (items, error) {
-	data, err := get(url + "?nid=557")
+func loadForecast(url string) ([]string, error) {
+	data, err := get(url + magicString)
 	if err != nil {
 		return nil, err
 	}
-	reg := regexp.MustCompile(`([/]dynamic.*[.]png).*(\d{2}[.]\d{2}[.]\d{4}).*(\d{2}[:]\d{2})`)
+	reg := regexp.MustCompile(`([/]dynamic.*[.]png).*\d{2}[.]\d{2}[.]\d{4}.*\d{2}[:]\d{2}`)
 	matches := reg.FindAllStringSubmatch(string(data), 100)
-	segs := make(items, len(matches))
+	images := make([]string, len(matches))
 	for i, v := range matches {
-		segs[i].image = v[1]
-		segs[i].date = v[2]
-		segs[i].time = v[3]
+		images[i] = v[1]
 	}
-	return segs, nil
+	return images, nil
 }
