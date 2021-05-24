@@ -225,28 +225,28 @@ func main() {
 	mainWindow.Run()
 }
 
-func loadIMG(URL string) (image.Image, error) {
-	data, err := get(page + URL)
+func loadIMG(url string) (image.Image, error) {
+	data, err := get(page + url)
 	if err != nil {
 		return nil, err
 	}
 	return png.Decode(bytes.NewReader(data))
 }
 
-func get(URL string) ([]byte, error) {
+func get(url string) ([]byte, error) {
 	client := http.Client{
 		CheckRedirect: func(req *http.Request, via []*http.Request) error {
 			return http.ErrUseLastResponse
 		},
 	}
-	req, err := http.NewRequest("GET", URL, nil)
+	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		return nil, err
 	}
 	for _, v := range cookies {
 		req.AddCookie(v)
 	}
-	req.Header.Set("Referer", URL)
+	req.Header.Set("Referer", url)
 	req.Header.Set("User-Agent", userAgent)
 	resp, err := client.Do(req)
 	if err != nil {
@@ -259,18 +259,18 @@ func get(URL string) ([]byte, error) {
 	return ioutil.ReadAll(resp.Body)
 }
 
-func loadCookies(URL string) ([]*http.Cookie, error) {
+func loadCookies(url string) ([]*http.Cookie, error) {
 	client := http.Client{
 		CheckRedirect: func(req *http.Request, via []*http.Request) error {
 			return http.ErrUseLastResponse
 		},
 	}
-	req, err := http.NewRequest("GET", URL, nil)
+	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		return nil, err
 	}
 
-	req.Header.Set("Referer", URL)
+	req.Header.Set("Referer", url)
 	req.Header.Set("User-Agent", userAgent)
 	resp, err := client.Do(req)
 	if err != nil {
@@ -280,8 +280,8 @@ func loadCookies(URL string) ([]*http.Cookie, error) {
 	return resp.Cookies(), nil
 }
 
-func loadForecast(URL string) ([]string, error) {
-	data, err := get(URL + magicString)
+func loadForecast(url string) ([]string, error) {
+	data, err := get(url + magicString)
 	if err != nil {
 		return nil, err
 	}
@@ -294,5 +294,5 @@ func loadForecast(URL string) ([]string, error) {
 }
 
 func appError(textEdit *walk.TextEdit, err error) {
-	textEdit.SetText(fmt.Sprintf(strings.Replace(appErrorStr, "\n", "\r\n", -1), err))
+	textEdit.SetText(fmt.Sprintf(strings.ReplaceAll(appErrorStr, "\n", "\r\n"), err))
 }
