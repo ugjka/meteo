@@ -54,7 +54,7 @@ var icon []byte
 
 const appErrorStr = `Radās sekojošā klūda: %s
 
-Pārbaudiet savu interneta savienujumu un restartējiet aplikāciju.
+Pārbaudiet savu interneta savienojumu un restartējiet aplikāciju.
 
 Vai ziņojiet: esesmu@protonmail.com`
 
