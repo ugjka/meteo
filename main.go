@@ -210,17 +210,19 @@ func main() {
 	iconBitmap, _ := walk.NewBitmapFromImageForDPI(iconRaw, 96)
 	mainWindow.SetIcon(iconBitmap)
 
-	cookies, err = loadCookies(page)
-	if err == nil {
-		forecast, err = loadForecast(precipitation)
-	}
-	if err != nil {
-		appError(textEdit, err)
-		textEdit.SetVisible(true)
-		imageView.SetVisible(false)
-	} else {
-		go load(0)
-	}
+	go func() {
+		cookies, err = loadCookies(page)
+		if err == nil {
+			forecast, err = loadForecast(precipitation)
+		}
+		if err != nil {
+			appError(textEdit, err)
+			textEdit.SetVisible(true)
+			imageView.SetVisible(false)
+		} else {
+			load(0)
+		}
+	}()
 
 	mainWindow.Run()
 }
